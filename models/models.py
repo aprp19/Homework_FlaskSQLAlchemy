@@ -42,7 +42,7 @@ class ModelKategoriBuku(db.Model):
     __tablename__ = 'kategoribuku'
 
     id_buku = db.Column(db.Integer, db.ForeignKey('buku.id_buku'), primary_key=True, nullable=False)
-    id_kategori = db.Column(db.Integer, db.ForeignKey('kategori.id_kategori'), primary_key=True, nullable=False)
+    id_kategori = db.Column(db.Integer, db.ForeignKey('kategori.id_kategori'), nullable=False)
 
 
 class ModelTransaksi(db.Model):

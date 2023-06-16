@@ -289,7 +289,7 @@ def handle_get_kategoribuku(id_buku):
             response = [{
                 "ID Buku": get.id_buku,
                 "Nama Buku": get.buku.nama_buku,
-                "Kategori Buku": get.kategori.nama_kategori
+                "Kategori Buku": [data.nama_kategori for data in ModelKategori.query.all()]
             } for get in getall]
             return {"Message": "Success", "Count": len(response), "Data": response,
                     "Admin Authority": check_auth.is_admin}, \
@@ -298,10 +298,11 @@ def handle_get_kategoribuku(id_buku):
         if not check_kategori_buku:
             return {"Message": "ID Buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
         else:
+            get_kategoribuku = ModelKategoriBuku.query.get(id_buku)
             response = {
-                "ID Buku": check_kategori_buku.id_buku,
-                "Nama Buku": check_kategori_buku.buku.nama_buku,
-                "Kategori Buku": check_kategori_buku.kategori.nama_kategori
+                "ID Buku": get_kategoribuku.id_buku,
+                "Nama Buku": get_kategoribuku.buku.nama_buku,
+                "List Kategori": [data.nama_kategori for data in ModelKategori.query.all()]
             }
             return {"Message": "Success", "Data": response, "Admin Authority": check_auth.is_admin}, 200
     else:
@@ -315,20 +316,20 @@ def handle_post_kategoribuku():
     if check_auth.is_admin:
         if request.is_json:
             json = request.get_json()
-            check_kategori_buku = ModelKategoriBuku.query.join(ModelBuku).filter_by(nama_buku=json['Nama Buku']).join(ModelKategori).filter_by(nama_kategori=json['Kategori']).first()
+            check_kategori_buku = ModelKategoriBuku.query.join(ModelBuku).filter_by(nama_buku=json['Nama Buku']).join(
+                ModelKategori).filter_by(nama_kategori=json['Kategori']).first()
             if check_kategori_buku is not None:
                 return {"Message": "Kategori buku sudah ada", "Admin Authority": check_auth.is_admin}, 406
             else:
-                check_buku = ModelBuku.query.filter_by(nama_buku=json['Nama Buku']).first()
-                check_kategori = ModelKategori.query.filter_by(nama_kategori=json['Kategori']).first()
-                if not check_buku or not check_kategori:
-                    return {"Message": "ID Buku/ID Kategori tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
+                buku = ModelBuku.query.filter_by(nama_buku=json['Nama Buku']).first()
+                kategori = ModelKategori.query.filter_by(nama_kategori=json['Kategori']).first()
+                if not buku or not kategori:
+                    return {"Message": "ID Buku/ID Kategori tidak ditemukan",
+                            "Admin Authority": check_auth.is_admin}, 404
                 else:
-                    get_buku = ModelBuku.query.filter_by(nama_buku=json['Nama Buku']).first()
-                    get_kategori = ModelKategori.query.filter_by(nama_kategori=json['Kategori']).first()
                     add_kategori_buku = ModelKategoriBuku(
-                        id_buku=get_buku.id_buku,
-                        id_kategori=get_kategori.id_kategori
+                        id_buku=buku.id_buku,
+                        id_kategori=kategori.id_kategori
                     )
                     db_session.add(add_kategori_buku)
                     db_session.commit()
@@ -348,7 +349,7 @@ def handle_put_kategoribuku(id_buku, id_kategori):
     if check_auth.is_admin:
         if request.is_json:
             json = request.get_json()
-            check_kategori_buku = ModelKategoriBuku.query.join(ModelBuku).filter_by(id_buku=id_buku).\
+            check_kategori_buku = ModelKategoriBuku.query.join(ModelBuku).filter_by(id_buku=id_buku). \
                 join(ModelKategori).filter_by(nama_kategori=json['Kategori']).first()
             if check_kategori_buku is not None:
                 return {"Message": "Kategori buku sudah ada", "Admin Authority": check_auth.is_admin}, 406
@@ -373,12 +374,11 @@ def handle_put_kategoribuku(id_buku, id_kategori):
 def handle_delete_kategoribuku(id_buku, id_kategori):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
     if check_auth.is_admin:
-        check_kategori_buku = ModelKategoriBuku.query.filter_by(id_buku=id_buku, id_kategori=id_kategori).first()
-        if not check_kategori_buku:
+        kategori_buku = ModelKategoriBuku.query.filter_by(id_buku=id_buku, id_kategori=id_kategori).first()
+        if not kategori_buku:
             return {"Message": "ID Buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
         else:
-            delete_kategoribuku = ModelKategoriBuku.query.filter_by(id_buku=id_buku, id_kategori=id_kategori).first()
-            db_session.delete(delete_kategoribuku)
+            db_session.delete(kategori_buku)
             db_session.commit()
             return {"Message": "Success", "Admin Authority": check_auth.is_admin}, 201
     else:
