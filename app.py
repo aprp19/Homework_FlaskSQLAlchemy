@@ -85,14 +85,14 @@ def handle_put_penulis(id_penulis):
 def handle_delete_penulis(id_penulis):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
     if check_auth.is_admin:
-        data_penulis = ModelPenulis.query.filter_by(id_penulis=id_penulis).first()
-        if not data_penulis:
+        check_penulis = ModelPenulis.query.filter_by(id_penulis=id_penulis).first()
+        if not check_penulis:
             return {"Message": "ID Penulis tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
         else:
-            db_session.delete(data_penulis)
+            delete_penulis = ModelPenulis.query.filter_by(id_penulis=id_penulis).first()
+            db_session.delete(delete_penulis)
             db_session.commit()
-            return {"Message": "Success", "Data": f"{data_penulis.nama_penulis}",
-                    "Admin Authority": check_auth.is_admin}, 201
+            return {"Message": "Success", "Admin Authority": check_auth.is_admin}, 201
     else:
         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
 
@@ -170,14 +170,14 @@ def handle_put_kategori(id_kategori):
 def handle_delete_kategori(id_kategori):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
     if check_auth.is_admin:
-        data_kategori = ModelKategori.query.filter_by(id_kategori=id_kategori).first()
-        if not data_kategori:
+        check_kategori = ModelKategori.query.filter_by(id_kategori=id_kategori).first()
+        if not check_kategori:
             return {"Message": "ID Kategori tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
         else:
-            db_session.delete(data_kategori)
+            delete_kategori = ModelKategori.query.filter_by(id_kategori=id_kategori).first()
+            db_session.delete(delete_kategori)
             db_session.commit()
-            return {"Message": "Success", "Data": f"{data_kategori.nama_kategori}",
-                    "Admin Authority": check_auth.is_admin}, 201
+            return {"Message": "Success", "Admin Authority": check_auth.is_admin}, 201
     else:
         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
 
@@ -267,14 +267,14 @@ def handle_put_buku(id_buku):
 def handle_delete_buku(id_buku):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
     if check_auth.is_admin:
-        data_buku = ModelBuku.query.filter_by(id_buku=id_buku).first()
-        if not data_buku:
+        check_buku = ModelBuku.query.filter_by(id_buku=id_buku).first()
+        if not check_buku:
             return {"Message": "ID buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 200
         else:
-            db_session.delete(data_buku)
+            delete_buku = ModelBuku.query.filter_by(id_buku=id_buku).first()
+            db_session.delete(delete_buku)
             db_session.commit()
-            return {"Message": "Success", "Data": f"{data_buku.nama_buku}",
-                    "Admin Authority": check_auth.is_admin}, 201
+            return {"Message": "Success", "Admin Authority": check_auth.is_admin}, 201
     else:
         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
 
@@ -294,14 +294,14 @@ def handle_get_kategoribuku(id_buku):
             return {"Message": "Success", "Count": len(response), "Data": response,
                     "Admin Authority": check_auth.is_admin}, \
                 200
-        get = ModelKategoriBuku.query.get(id_buku)
-        if not get:
+        check_kategori_buku = ModelKategoriBuku.query.get(id_buku)
+        if not check_kategori_buku:
             return {"Message": "ID Buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
         else:
             response = {
-                "ID Buku": get.id_buku,
-                "Nama Buku": get.buku.nama_buku,
-                "Kategori Buku": get.kategori.nama_kategori
+                "ID Buku": check_kategori_buku.id_buku,
+                "Nama Buku": check_kategori_buku.buku.nama_buku,
+                "Kategori Buku": check_kategori_buku.kategori.nama_kategori
             }
             return {"Message": "Success", "Data": response, "Admin Authority": check_auth.is_admin}, 200
     else:
@@ -348,8 +348,8 @@ def handle_put_kategoribuku(id_buku, id_kategori):
     if check_auth.is_admin:
         if request.is_json:
             json = request.get_json()
-            check_kategori_buku = ModelKategoriBuku.query.join(ModelBuku).filter_by(id_buku=id_buku).join(
-                ModelKategori).filter_by(nama_kategori=json['Kategori']).first()
+            check_kategori_buku = ModelKategoriBuku.query.join(ModelBuku).filter_by(id_buku=id_buku).\
+                join(ModelKategori).filter_by(nama_kategori=json['Kategori']).first()
             if check_kategori_buku is not None:
                 return {"Message": "Kategori buku sudah ada", "Admin Authority": check_auth.is_admin}, 406
             else:
@@ -368,21 +368,21 @@ def handle_put_kategoribuku(id_buku, id_kategori):
         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
 
 
-# @app.route('/buku/<id_buku>', methods=['DELETE'])
-# @basic_auth
-# def handle_delete_buku(id_buku):
-#     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-#     if check_auth.is_admin:
-#         data_buku = ModelBuku.query.filter_by(id_buku=id_buku).first()
-#         if not data_buku:
-#             return {"Message": "ID buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 200
-#         else:
-#             db_session.delete(data_buku)
-#             db_session.commit()
-#             return {"Message": "Success", "Data": f"{data_buku.nama_buku}",
-#                     "Admin Authority": check_auth.is_admin}, 201
-#     else:
-#         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
+@app.route('/kategori_buku/<id_buku>/<id_kategori>', methods=['DELETE'])
+@basic_auth
+def handle_delete_kategoribuku(id_buku, id_kategori):
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin:
+        check_kategori_buku = ModelKategoriBuku.query.filter_by(id_buku=id_buku, id_kategori=id_kategori).first()
+        if not check_kategori_buku:
+            return {"Message": "ID Buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
+        else:
+            delete_kategoribuku = ModelKategoriBuku.query.filter_by(id_buku=id_buku, id_kategori=id_kategori).first()
+            db_session.delete(delete_kategoribuku)
+            db_session.commit()
+            return {"Message": "Success", "Admin Authority": check_auth.is_admin}, 201
+    else:
+        return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
 
 
 if __name__ == '__main__':
