@@ -385,5 +385,109 @@ def handle_delete_kategoribuku(id_buku, id_kategori):
         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
 
 
+@app.route('/users/<id_user>', methods=['GET'])
+@basic_auth
+def handle_get_users(id_user):
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin:
+        if id_user == 'all':
+            query = ModelUsers.query.all()
+            print(query)
+            response = [{
+                "ID User": data.id_user,
+                "Nama User": data.nama_user,
+                "Username": data.username,
+                "password": data.passwords,
+                "Role": data.is_admin
+            } for data in query]
+            return {"Message": "Success", "Count": len(response), "Data": response,
+                    "Admin Authority": check_auth.is_admin}, \
+                200
+        query = ModelUsers.query.get(id_user)
+        if not query:
+            return {"Message": "User tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
+        else:
+            response = {
+                "ID User": query.id_user,
+                "Nama User": query.nama_user,
+                "Username": query.username,
+                "password": query.passwords,
+                "Role": query.is_admin
+            }
+            return {"Message": "Success", "Data": response, "Admin Authority": check_auth.is_admin}, 200
+    else:
+        return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
+
+
+@app.route('/users', methods=['POST'])
+@basic_auth
+def handle_post_users():
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin:
+        if request.is_json:
+            json = request.get_json()
+            check_users = ModelUsers.query.filter_by(username=json['username']).first()
+            if check_users is not None:
+                return {"Message": "User sudah ada", "Admin Authority": check_auth.is_admin}, 406
+            else:
+                add_user = ModelUsers(
+                    username=json['username'],
+                    passwords=json['password'],
+                    nama_user=json['nama_user'],
+                    is_admin=json['is_admin'],
+                )
+                db_session.add(add_user)
+                db_session.commit()
+                return {"Message": "Success", "Data": f"{add_user.nama_user}",
+                        "Admin Authority": check_auth.is_admin}, \
+                    201
+        else:
+            return {"Message": "Invalid Request", "Admin Authority": check_auth.is_admin}, 400
+    else:
+        return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
+
+
+@app.route('/users/<username>', methods=['PUT'])
+@basic_auth
+def handle_put_users(username):
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin[:5] == 'Admin':
+        if request.is_json:
+            json = request.get_json()
+            check_users = ModelUsers.query.filter_by(username=username).first()
+            if not check_users:
+                return {"Message": "User tidak ditemukan", "Admin Authority": check_auth.is_admin}, 406
+            else:
+                query = ModelUsers.query.get(check_users.id_user)
+                query.nama_user = json['nama_user']
+                query.passwords = json['password']
+                query.is_admin = json['is_admin']
+                db_session.add(query)
+                db_session.commit()
+            return {"Message": "Success", "Data": f"{query.nama_user}",
+                    "Admin Authority": check_auth.is_admin}, \
+                201
+        else:
+            return {"Message": "Invalid Request", "Admin Authority": check_auth.is_admin}, 400
+    else:
+        return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
+#
+#
+# @app.route('/kategori_buku/<id_buku>/<id_kategori>', methods=['DELETE'])
+# @basic_auth
+# def handle_delete_kategoribuku(id_buku, id_kategori):
+#     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+#     if check_auth.is_admin:
+#         kategori_buku = ModelKategoriBuku.query.filter_by(id_buku=id_buku, id_kategori=id_kategori).first()
+#         if not kategori_buku:
+#             return {"Message": "ID Buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
+#         else:
+#             db_session.delete(kategori_buku)
+#             db_session.commit()
+#             return {"Message": "Success", "Admin Authority": check_auth.is_admin}, 201
+#     else:
+#         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
+
+
 if __name__ == '__main__':
     app.run()

@@ -8,7 +8,7 @@ class ModelUsers(db.Model):
     username = db.Column(db.String(25), nullable=False)
     passwords = db.Column(db.String(25), nullable=False)
     nama_user = db.Column(db.String(25), nullable=False)
-    is_admin = db.Column(db.Boolean, nullable=False)
+    is_admin = db.Column(db.String(25), nullable=False)
     relasi_transaksi = db.relationship('ModelTransaksi', backref='users')
 
 
@@ -54,5 +54,6 @@ class ModelTransaksi(db.Model):
     nama_peminjam = db.Column(db.String(25), nullable=False)
     tgl_pinjam = db.Column(db.String(25), nullable=False)
     tgl_kembali = db.Column(db.String(25))
-    nama_admin = db.Column(db.String(25))
+    admin_pinjam = db.Column(db.String(25))
+    admin_kembali = db.Column(db.String(25))
     status = db.Column(db.String(25), nullable=False)
