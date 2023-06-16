@@ -341,27 +341,33 @@ def handle_post_kategoribuku():
         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
 
 
-# @app.route('/buku/<id_buku>', methods=['PUT'])
-# @basic_auth
-# def handle_put_buku(id_buku):
-#     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-#     if check_auth.is_admin:
-#         if request.is_json:
-#             data_buku = ModelBuku.query.get(id_buku)
-#             json = request.get_json()
-#             data_buku.nama_buku = json['Nama Buku']
-#             data_buku.id_penulis = json['ID Penulis']
-#             db_session.add(data_buku)
-#             db_session.commit()
-#             return {"Message": "Success", "Data": f"{data_buku.nama_buku}",
-#                     "Admin Authority": check_auth.is_admin}, \
-#                 201
-#         else:
-#             return {"Message": "Invalid Request", "Admin Authority": check_auth.is_admin}, 400
-#     else:
-#         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
-#
-#
+@app.route('/kategori_buku/<id_buku>/<id_kategori>', methods=['PUT'])
+@basic_auth
+def handle_put_kategoribuku(id_buku, id_kategori):
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin:
+        if request.is_json:
+            json = request.get_json()
+            check_kategori_buku = ModelKategoriBuku.query.join(ModelBuku).filter_by(id_buku=id_buku).join(
+                ModelKategori).filter_by(nama_kategori=json['Kategori']).first()
+            if check_kategori_buku is not None:
+                return {"Message": "Kategori buku sudah ada", "Admin Authority": check_auth.is_admin}, 406
+            else:
+                kategori_buku = ModelKategoriBuku.query.filter_by(id_buku=id_buku, id_kategori=id_kategori).first()
+                get_kategori = ModelKategori.query.filter_by(nama_kategori=json['Kategori']).first()
+                kategori_buku.id_buku = id_buku
+                kategori_buku.id_kategori = get_kategori.id_kategori
+                db_session.add(kategori_buku)
+                db_session.commit()
+            return {"Message": "Success", "Data": f"{kategori_buku.buku.nama_buku}",
+                    "Admin Authority": check_auth.is_admin}, \
+                201
+        else:
+            return {"Message": "Invalid Request", "Admin Authority": check_auth.is_admin}, 400
+    else:
+        return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
+
+
 # @app.route('/buku/<id_buku>', methods=['DELETE'])
 # @basic_auth
 # def handle_delete_buku(id_buku):
