@@ -28,6 +28,7 @@ class ModelBuku(db.Model):
     nama_buku = db.Column(db.String(25), nullable=False)
     id_penulis = db.Column(db.String(25), db.ForeignKey('penulis.id_penulis'), nullable=False)
     relasi_kategori_buku = db.relationship('ModelKategoriBuku', backref='buku')
+    relasi_transaksi_buku = db.relationship('ModelTransaksi', backref='buku')
 
 
 class ModelKategori(db.Model):

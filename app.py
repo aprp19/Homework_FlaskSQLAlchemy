@@ -1,4 +1,5 @@
 from flask import Flask, request
+from datetime import date
 from models.database import db, db_session
 from models.models import ModelUsers, ModelBuku, ModelKategori, ModelTransaksi, ModelPenulis, ModelKategoriBuku
 from auth.authentication import basic_auth
@@ -12,7 +13,7 @@ db.init_app(app)
 @basic_auth
 def handle_get_penulis(id_penulis):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if id_penulis == 'all':
             getall = ModelPenulis.query.all()
             response = [{
@@ -41,7 +42,7 @@ def handle_get_penulis(id_penulis):
 @basic_auth
 def handle_post_penulis():
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if request.is_json:
             json = request.get_json()
             add_penulis = ModelPenulis(
@@ -63,7 +64,7 @@ def handle_post_penulis():
 @basic_auth
 def handle_put_penulis(id_penulis):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if request.is_json:
             data_penulis = ModelPenulis.query.get(id_penulis)
             json = request.get_json()
@@ -84,7 +85,7 @@ def handle_put_penulis(id_penulis):
 @basic_auth
 def handle_delete_penulis(id_penulis):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         check_penulis = ModelPenulis.query.filter_by(id_penulis=id_penulis).first()
         if not check_penulis:
             return {"Message": "ID Penulis tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
@@ -101,7 +102,7 @@ def handle_delete_penulis(id_penulis):
 @basic_auth
 def handle_get_kategori(id_kategori):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if id_kategori == 'all':
             getall = ModelKategori.query.all()
             response = [{
@@ -128,7 +129,7 @@ def handle_get_kategori(id_kategori):
 @basic_auth
 def handle_post_kategori():
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if request.is_json:
             json = request.get_json()
             add_kategori = ModelKategori(
@@ -149,7 +150,7 @@ def handle_post_kategori():
 @basic_auth
 def handle_put_kategori(id_kategori):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if request.is_json:
             data_kategori = ModelKategori.query.get(id_kategori)
             json = request.get_json()
@@ -169,7 +170,7 @@ def handle_put_kategori(id_kategori):
 @basic_auth
 def handle_delete_kategori(id_kategori):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         check_kategori = ModelKategori.query.filter_by(id_kategori=id_kategori).first()
         if not check_kategori:
             return {"Message": "ID Kategori tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
@@ -186,7 +187,7 @@ def handle_delete_kategori(id_kategori):
 @basic_auth
 def handle_get_buku(id_buku):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if id_buku == 'all':
             getall = ModelBuku.query.all()
             response = [{
@@ -215,7 +216,7 @@ def handle_get_buku(id_buku):
 @basic_auth
 def handle_post_buku():
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if request.is_json:
             json = request.get_json()
             check_buku = ModelBuku.query.filter_by(nama_buku=json['Nama Buku']).first()
@@ -245,7 +246,7 @@ def handle_post_buku():
 @basic_auth
 def handle_put_buku(id_buku):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if request.is_json:
             data_buku = ModelBuku.query.get(id_buku)
             json = request.get_json()
@@ -266,7 +267,7 @@ def handle_put_buku(id_buku):
 @basic_auth
 def handle_delete_buku(id_buku):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         check_buku = ModelBuku.query.filter_by(id_buku=id_buku).first()
         if not check_buku:
             return {"Message": "ID buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 200
@@ -283,7 +284,7 @@ def handle_delete_buku(id_buku):
 @basic_auth
 def handle_get_kategoribuku(id_buku):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if id_buku == 'all':
             getall = ModelKategoriBuku.query.all()
             response = [{
@@ -313,7 +314,7 @@ def handle_get_kategoribuku(id_buku):
 @basic_auth
 def handle_post_kategoribuku():
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if request.is_json:
             json = request.get_json()
             check_kategori_buku = ModelKategoriBuku.query.join(ModelBuku).filter_by(nama_buku=json['Nama Buku']).join(
@@ -346,7 +347,7 @@ def handle_post_kategoribuku():
 @basic_auth
 def handle_put_kategoribuku(id_buku, id_kategori):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if request.is_json:
             json = request.get_json()
             check_kategori_buku = ModelKategoriBuku.query.join(ModelBuku).filter_by(id_buku=id_buku). \
@@ -373,7 +374,7 @@ def handle_put_kategoribuku(id_buku, id_kategori):
 @basic_auth
 def handle_delete_kategoribuku(id_buku, id_kategori):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         kategori_buku = ModelKategoriBuku.query.filter_by(id_buku=id_buku, id_kategori=id_kategori).first()
         if not kategori_buku:
             return {"Message": "ID Buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
@@ -389,7 +390,7 @@ def handle_delete_kategoribuku(id_buku, id_kategori):
 @basic_auth
 def handle_get_users(id_user):
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if id_user == 'all':
             query = ModelUsers.query.all()
             print(query)
@@ -423,7 +424,7 @@ def handle_get_users(id_user):
 @basic_auth
 def handle_post_users():
     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-    if check_auth.is_admin:
+    if check_auth.is_admin[:5] == 'Admin':
         if request.is_json:
             json = request.get_json()
             check_users = ModelUsers.query.filter_by(username=json['username']).first()
@@ -471,22 +472,215 @@ def handle_put_users(username):
             return {"Message": "Invalid Request", "Admin Authority": check_auth.is_admin}, 400
     else:
         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
-#
-#
-# @app.route('/kategori_buku/<id_buku>/<id_kategori>', methods=['DELETE'])
-# @basic_auth
-# def handle_delete_kategoribuku(id_buku, id_kategori):
-#     check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
-#     if check_auth.is_admin:
-#         kategori_buku = ModelKategoriBuku.query.filter_by(id_buku=id_buku, id_kategori=id_kategori).first()
-#         if not kategori_buku:
-#             return {"Message": "ID Buku tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
-#         else:
-#             db_session.delete(kategori_buku)
-#             db_session.commit()
-#             return {"Message": "Success", "Admin Authority": check_auth.is_admin}, 201
-#     else:
-#         return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
+
+
+@app.route('/users/<username>', methods=['DELETE'])
+@basic_auth
+def handle_delete_users(username):
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin[:5] == 'Admin':
+        check_users = ModelUsers.query.filter_by(username=username).first()
+        if not check_users:
+            return {"Message": "User tidak ditemukan", "Admin Authority": check_auth.is_admin}, 406
+        else:
+            db_session.add(check_users)
+            db_session.commit()
+        return {"Message": "Success", "Admin Authority": check_auth.is_admin}, \
+            201
+    else:
+        return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
+
+
+@app.route('/transaksi/<id_transaksi>', methods=['GET'])
+@basic_auth
+def handle_get_transaksi(id_transaksi):
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin[6:] == 'Terima':
+        query_terima = ModelTransaksi.query.filter(ModelTransaksi.status == 'Requested').all()
+        if id_transaksi == 'all':
+            response = [{
+                "ID Transaksi": data.id_transaksi,
+                "ID Buku": data.id_buku,
+                "Nama Buku": data.buku.nama_buku,
+                "ID User": data.id_user,
+                "Nama Peminjam": data.users.nama_user,
+                "Tanggal Pinjam": data.tgl_pinjam,
+                "Tanggal Kembali": data.tgl_kembali,
+                "Admin Pinjam": data.admin_pinjam,
+                "Admin Kembali": data.admin_kembali,
+                "Status": data.status
+            } for data in query_terima]
+            return {"Message": "Success", "Count": len(response), "Data": response,
+                    "Admin Authority": check_auth.is_admin}, \
+                200
+        query_terima = ModelTransaksi.query.filter(ModelTransaksi.id_transaksi == id_transaksi,
+                                                   ModelTransaksi.status == 'Requested').first()
+        if not query_terima:
+            return {"Message": "Transaksi tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
+        else:
+            response = {
+                "ID Transaksi": query_terima.id_transaksi,
+                "ID Buku": query_terima.id_buku,
+                "Nama Buku": query_terima.buku.nama_buku,
+                "ID User": query_terima.id_user,
+                "Nama Peminjam": query_terima.users.nama_user,
+                "Tanggal Pinjam": query_terima.tgl_pinjam,
+                "Tanggal Kembali": query_terima.tgl_kembali,
+                "Admin Pinjam": query_terima.admin_pinjam,
+                "Admin Kembali": query_terima.admin_kembali,
+                "Status": query_terima.status
+            }
+            return {"Message": "Success", "Data": response, "Admin Authority": check_auth.is_admin}, 200
+
+    elif check_auth.is_admin[6:] == 'Kembali':
+        query_kembali = ModelTransaksi.query.filter(ModelTransaksi.status == 'Approved').all()
+        if id_transaksi == 'all':
+            response = [{
+                "ID Transaksi": data.id_transaksi,
+                "ID Buku": data.id_buku,
+                "Nama Buku": data.buku.nama_buku,
+                "ID User": data.id_user,
+                "Nama Peminjam": data.users.nama_user,
+                "Tanggal Pinjam": data.tgl_pinjam,
+                "Tanggal Kembali": data.tgl_kembali,
+                "Admin Pinjam": data.admin_pinjam,
+                "Admin Kembali": data.admin_kembali,
+                "Status": data.status
+            } for data in query_kembali]
+            return {"Message": "Success", "Count": len(response), "Data": response,
+                    "Admin Authority": check_auth.is_admin}, \
+                200
+        query_kembali = ModelTransaksi.query.filter(ModelTransaksi.id_transaksi == id_transaksi,
+                                                    ModelTransaksi.status == 'Approved').first()
+        if query_kembali:
+            response = {
+                "ID Transaksi": query_kembali.id_transaksi,
+                "ID Buku": query_kembali.id_buku,
+                "Nama Buku": query_kembali.buku.nama_buku,
+                "ID User": query_kembali.id_user,
+                "Nama Peminjam": query_kembali.users.nama_user,
+                "Tanggal Pinjam": query_kembali.tgl_pinjam,
+                "Tanggal Kembali": query_kembali.tgl_kembali,
+                "Admin Pinjam": query_kembali.admin_pinjam,
+                "Admin Kembali": query_kembali.admin_kembali,
+                "Status": query_kembali.status
+            }
+            return {"Message": "Success", "Data": response, "Admin Authority": check_auth.is_admin}, 200
+        else:
+            return {"Message": "Transaksi tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
+    else:
+
+        query_user = ModelTransaksi.query.filter_by(id_user=check_auth.id_user).all()
+        if id_transaksi == 'all':
+            response = [{
+                "ID Transaksi": data.id_transaksi,
+                "ID Buku": data.id_buku,
+                "Nama Buku": data.buku.nama_buku,
+                "ID User": data.id_user,
+                "Nama Peminjam": data.users.nama_user,
+                "Tanggal Pinjam": data.tgl_pinjam,
+                "Tanggal Kembali": data.tgl_kembali,
+                "Admin Pinjam": data.admin_pinjam,
+                "Admin Kembali": data.admin_kembali,
+                "Status": data.status
+            } for data in query_user]
+            return {"Message": "Success", "Count": len(response), "Data": response,
+                    "Admin Authority": check_auth.is_admin}, \
+                200
+        elif query_user.id_transaksi == id_transaksi:
+            response = {
+                "ID Transaksi": query_user.id_transaksi,
+                "ID Buku": query_user.id_buku,
+                "Nama Buku": query_user.buku.nama_buku,
+                "ID User": query_user.id_user,
+                "Nama Peminjam": query_user.users.nama_user,
+                "Tanggal Pinjam": query_user.tgl_pinjam,
+                "Tanggal Kembali": query_user.tgl_kembali,
+                "Admin Pinjam": query_user.admin_pinjam,
+                "Admin Kembali": query_user.admin_kembali,
+                "Status": query_user.status
+            }
+            return {"Message": "Success", "Data": response, "Admin Authority": check_auth.is_admin}, 200
+        else:
+            return {"Message": "Transaksi tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
+
+
+@app.route('/transaksi', methods=['POST'])
+@basic_auth
+def handle_post_transaksi():
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin == 'false':
+        if request.is_json:
+            json = request.get_json()
+            add_transaksi = ModelTransaksi(
+                id_buku=json['ID Buku'],
+                id_user=check_auth.id_user,
+                nama_peminjam=check_auth.nama_user,
+                tgl_pinjam=date.today().strftime("%d-%m-%Y"),
+                status='Requested'
+            )
+            db_session.add(add_transaksi)
+            db_session.commit()
+            return {"Message": "Success", "Data": f"{ModelTransaksi.buku.nama_buku} berhasil ditambahkan",
+                    "Admin Authority": check_auth.is_admin}, \
+                201
+        else:
+            return {"Message": "Data tidak valid"}, 400
+    else:
+        return {"Message": "Anda tidak memiliki akses"}, 403
+
+
+@app.route('/transaksi/<id_transaksi>', methods=['PUT'])
+@basic_auth
+def handle_put_transaksi(id_transaksi):
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin[6:] == 'Terima':
+        query_terima = ModelTransaksi.query.filter(ModelTransaksi.id_transaksi == id_transaksi,
+                                                   ModelTransaksi.status == 'Requested').first()
+        if not query_terima:
+            return {"Message": "Transaksi tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
+        else:
+            query_terima.admin_pinjam = check_auth.nama_user
+            query_terima.status = 'Approved'
+            db_session.add(query_terima)
+            db_session.commit()
+            return {"Message": "Success", "Data": 'Approved',
+                    "Admin Authority": check_auth.is_admin}, \
+                200
+
+    elif check_auth.is_admin[6:] == 'Kembali':
+        query_kembali = ModelTransaksi.query.filter(ModelTransaksi.id_transaksi == id_transaksi,
+                                                    ModelTransaksi.status == 'Approved').first()
+        if not query_kembali:
+            return {"Message": "Transaksi tidak ditemukan", "Admin Authority": check_auth.is_admin}, 404
+        else:
+            query_kembali.tgl_kembali = date.today().strftime("%d-%m-%Y")
+            query_kembali.admin_kembali = check_auth.nama_user
+            query_kembali.status = 'Returned'
+            db_session.add(query_kembali)
+            db_session.commit()
+            return {"Message": "Success", "Data": 'Returned',
+                    "Admin Authority": check_auth.is_admin}, \
+                200
+    else:
+        return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
+
+
+@app.route('/transaksi/<id_transaksi>', methods=['DELETE'])
+@basic_auth
+def handle_delete_transaksi(id_transaksi):
+    check_auth = ModelUsers.query.filter_by(username=request.authorization.username).first()
+    if check_auth.is_admin[:5] == 'Admin':
+        check_transaksi = ModelTransaksi.query.filter_by(id_transaksi=id_transaksi).first()
+        if not check_transaksi:
+            return {"Message": "Transaksi tidak ditemukan", "Admin Authority": check_auth.is_admin}, 406
+        else:
+            db_session.delete(check_transaksi)
+            db_session.commit()
+        return {"Message": "Success", "Admin Authority": check_auth.is_admin}, \
+            201
+    else:
+        return {"Message": "Admin Access Only", "Admin Authority": check_auth.is_admin}, 403
 
 
 if __name__ == '__main__':
