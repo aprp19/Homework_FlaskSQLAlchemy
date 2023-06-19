@@ -290,7 +290,7 @@ def handle_get_kategoribuku(id_buku):
             response = [{
                 "ID Buku": get.id_buku,
                 "Nama Buku": get.buku.nama_buku,
-                "Kategori Buku": [data.nama_kategori for data in ModelKategori.query.all()]
+                "Kategori Buku": [data.nama_kategori for data in ModelKategori.query.filter(ModelKategoriBuku.id_buku==get.id_buku, ModelKategori.id_kategori==ModelKategoriBuku.id_kategori).all()]
             } for get in getall]
             return {"Message": "Success", "Count": len(response), "Data": response,
                     "Admin Authority": check_auth.is_admin}, \
@@ -303,7 +303,7 @@ def handle_get_kategoribuku(id_buku):
             response = {
                 "ID Buku": get_kategoribuku.id_buku,
                 "Nama Buku": get_kategoribuku.buku.nama_buku,
-                "List Kategori": [data.nama_kategori for data in ModelKategori.query.all()]
+                "List Kategori": [data.nama_kategori for data in ModelKategori.query.filter(ModelKategoriBuku.id_buku==get_kategoribuku.id_buku, ModelKategori.id_kategori==ModelKategoriBuku.id_kategori)]
             }
             return {"Message": "Success", "Data": response, "Admin Authority": check_auth.is_admin}, 200
     else:
@@ -621,7 +621,7 @@ def handle_post_transaksi():
             )
             db_session.add(add_transaksi)
             db_session.commit()
-            return {"Message": "Success", "Data": f"{ModelTransaksi.buku.nama_buku} berhasil ditambahkan",
+            return {"Message": "Success", "Data": f"{ModelBuku.query.filter_by(id_buku=json['ID Buku']).first().nama_buku} berhasil dipinjam",
                     "Admin Authority": check_auth.is_admin}, \
                 201
         else:
